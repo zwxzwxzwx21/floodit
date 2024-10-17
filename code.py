@@ -30,27 +30,29 @@ board = None
 #main loop
 position_of_group = [(0,0)]
 real_pos_array = []
-while True:
+'''board_transformed =[['Y', 'Y', 'Y', 'Y', 'O', 'Y'],
+                    ['C', 'Y', 'G', 'Y', 'Y', 'Y'],
+                    ['R', 'P', 'C', 'G', 'Y', 'Y'],
+                    ['O', 'G', 'Y', 'R', 'Y', 'O'],
+                    ['G', 'Y', 'Y', 'Y', 'Y', 'Y'],
+                    ['Y', 'Y', 'G', 'Y', 'I', 'Y']]'''
+board = create_board(size, colors)
+board_transformed = [[color_LUT[(color)] for color in row] for row in board]
+def flood_it_logic(board_transformed,pos_array,number_of_moves):
+    number_of_moves += 1
+    print("loop started")
 
-    if board == None:
-        board_transformed = [['Y', 'Y', 'Y', 'Y', 'O', 'Y'],
-                ['C', 'Y', 'G', 'Y', 'Y', 'Y'],
-                ['R', 'P', 'C', 'G', 'Y', 'Y'],
-                ['O', 'G', 'Y', 'R', 'Y', 'O'],
-                ['G', 'Y', 'Y', 'Y', 'Y', 'Y'],
-                ['Y', 'Y', 'G', 'Y', 'I', 'Y']]
-        #board = create_board(size, colors)
-        #board_transformed = [[color_LUT[(color)] for color in row] for row in board]
+
     #determining positions of current connected colors
     new_color = True # loop arg to check for new color
     board_transformed_copy = copy.deepcopy(board_transformed)
     current_color = board_transformed_copy[0][0]
     while new_color:
-        print('position of group:', position_of_group)
+        print('position of group:', pos_array)
         new_color = False
         temp_array = [] # for adding positions and printing them
-        for position in position_of_group:
-            print('checking position',position,'lenght of group',len(position_of_group))
+        for position in pos_array:
+            print('checking position',position,'lenght of group',len(pos_array))
             print('checking for board')
             for row in board_transformed_copy:
                 print(row)
@@ -85,13 +87,20 @@ while True:
                     print('found position: x+1', pos)
                     new_color = True
         for pos in temp_array:
-            position_of_group.append(pos)
-        for pos in  position_of_group:
+            if pos not in pos_array:
+                pos_array.append(pos)
+        print(real_pos_array, "real pos array")
+        for pos in  pos_array:
             if pos not in real_pos_array:
+                print('appending',pos)
                 real_pos_array.append(pos)
-        position_of_group = temp_array
+        #pos_array = copy.deepcopy(temp_array)
         board_transformed_copy[0][0] = 'X'
         print('board transformed copy')
+        if is_game_over(board_transformed_copy):
+            print('###############################################')
+            print(f'victory! you won in {number_of_moves} moves!'); break
+            print('###############################################')
         for row in board_transformed_copy:
             print(row)
         print(new_color, 'new color')
@@ -109,8 +118,17 @@ while True:
     #endregion
 
     user_input = input("Enter your move: ")
-    if user_input in colors_array:
-        pass
+    if user_input in color_LUT:
+        for position in real_pos_array:
+            print("changed position",position)
+            for row in board_transformed_copy:
+                print(row)
+            board_transformed_copy[position[1]][position[0]] = color_LUT[user_input]
+        print("changing to", color_LUT[user_input])
+        board_transformed = copy.deepcopy(board_transformed_copy)
+        flood_it_logic(board_transformed, real_pos_array,number_of_moves)
+    else: print("something is wrong")
 
+flood_it_logic(board_transformed, position_of_group,0)
 
 
