@@ -1,41 +1,71 @@
 import random
-import random
+import numpy as np
 import copy
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+
 def create_board(size, colors):
-    return [[random.choice(colors) for _ in range(size)] for _ in range(size)]
+
+    color_map = {i: color for i, color in enumerate(colors)}
+    board = np.random.choice(list(color_map.keys()), (size, size))
+    return board, color_map
+
+    # return [[random.choice(colors) for _ in range(size)] for _ in range(size)]
 
 def flood_fill(board, x, y, target_color, new_color):
-    # Implement flood-fill logic here
-    pass
+    mask = np.zeros_like(board,dtype=bool)
+    stack = [(x,y)]
+    while stack:
+        cx, cy = stack.pop()
+        if mask[cy,cx] or board[cx,cy] != target_color:
+            continue
+        mask[cy,cx] = True
 
+        if cx > 0: stack.append((cx - 1,cy))
+        if cx < board.shape[0] - 1: stack.append((cx + 1,cy))
+        if cy > 0: stack.append((cx,cy - 1))
+        if cy < board.shape[1] - 1: stack.append((cx,cy + 1))
+    board[mask] = new_color
+    return board
 def is_game_over(board):
-    return all(cell == board[0][0] for row in board for cell in row)
+    # return all(cell == board[0][0] for row in board for cell in row)
+    return np.all(board == board[0,0])
 
+def display_board(board, color_map):
+    color_list = [color_map[key] for key in sorted(color_map.keys())]
+    cmap = mcolors.ListedColormap(color_list)
+    plt.imshow(board,cmap=cmap,origin='upper')
+    plt.xticks([])
+    plt.yticks([])
+    plt.title('test')
+    plt.show()
 # Create random board for AI to play on
 size = 6
 colors = ["red","yellow","green","orange","purple","cyan","blue","pink"]
 
-color_LUT = {
-    "red": 'R',
-    "yellow": 'Y',
-    "green": 'G',
-    "orange": 'O',
-    "purple": 'P',
-    "cyan": 'C',
-    "blue": 'B',
-    "pink": 'I',
-}
 colors_array = ["r","y","g","b","o","p","c","i"]
-board = None
+board,color_map = create_board(size,colors)
 #main loop
-position_of_group = [(0,0)]
+num_moves = 0
+while not is_game_over(board):
+    display_board(board,color_map)
+    user_input = input('write your color: "red","yellow","green","orange","purple","cyan","blue","pink" ')
+    if user_input in color_map_values():
+        new_color = list(color_map.keys())[list(color_map.values()).index(unser_input)]
+        target_color = board[0,0]
+        if target_color != mew_color:
+            board = flood_fill(board,0,0,target_color, new_color)
+            num_moves += 1
+    else: print('wrong color ')
+display_board(board,color_map)
+'''position_of_group = [(0,0)]
 real_pos_array = []
-'''board_transformed =[['Y', 'Y', 'Y', 'Y', 'O', 'Y'],
+board_transformed =[['Y', 'Y', 'Y', 'Y', 'O', 'Y'],
                     ['C', 'Y', 'G', 'Y', 'Y', 'Y'],
                     ['R', 'P', 'C', 'G', 'Y', 'Y'],
                     ['O', 'G', 'Y', 'R', 'Y', 'O'],
                     ['G', 'Y', 'Y', 'Y', 'Y', 'Y'],
-                    ['Y', 'Y', 'G', 'Y', 'I', 'Y']]'''
+                    ['Y', 'Y', 'G', 'Y', 'I', 'Y']]
 board = create_board(size, colors)
 board_transformed = [[color_LUT[(color)] for color in row] for row in board]
 def flood_it_logic(board_transformed,pos_array,number_of_moves):
@@ -99,24 +129,24 @@ def flood_it_logic(board_transformed,pos_array,number_of_moves):
         print('board transformed copy')
         if is_game_over(board_transformed_copy):
             print('###############################################')
-            print(f'victory! you won in {number_of_moves} moves!'); break
-            print('###############################################')
+            print(f'victory! you won in {number_of_moves} moves!')
+            print('###############################################'); break
         for row in board_transformed_copy:
             print(row)
         print(new_color, 'new color')
     print("leaving loop")
     print(real_pos_array)
+'''
 
 
-
-    #printing boards
-    #region
-    ''' for row in board:
-        print(row)'''
-    '''for row in board_transformed:
-        print(row)'''
-    #endregion
-
+#printing boards
+#region
+''' for row in board:
+    print(row)'''
+'''for row in board_transformed:
+    print(row)'''
+#endregion
+'''
     user_input = input("Enter your move: ")
     if user_input in color_LUT:
         for position in real_pos_array:
@@ -129,6 +159,5 @@ def flood_it_logic(board_transformed,pos_array,number_of_moves):
         flood_it_logic(board_transformed, real_pos_array,number_of_moves)
     else: print("something is wrong")
 
-flood_it_logic(board_transformed, position_of_group,0)
-
+flood_it_logic(board_transformed, position_of_group,0)'''
 
